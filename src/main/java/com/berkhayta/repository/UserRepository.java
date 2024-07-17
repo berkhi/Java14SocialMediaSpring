@@ -1,0 +1,21 @@
+package com.berkhayta.repository;
+
+
+import com.berkhayta.entity.User;
+import com.berkhayta.views.VwUserProfile;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<User,Long> {
+
+    Optional<User> findOptionalByUserNameAndPassword(String userName, String password);
+
+    List<User> findAllByUserNameContaining(String userName);
+
+    @Query("select new com.berkhayta.views.VwUserProfile(u.name,u.userName,u.avatar,u.followerCount,u.followingCount,u.about,u.bornDate,u.phone,u.address) from User u where u.id=?1")
+    VwUserProfile getByAuthId(Long id);
+
+}
