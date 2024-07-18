@@ -1,6 +1,5 @@
-package com.berkhayta.entity;
+package com.berkhayta.dto.response;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,18 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Entity
-@Table(name = "tblpost")
-public class Post {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+public class PostListResponseDto {
     Long userId;
-    String comment;
+    String userName;
+    String avatar;
     String photo;
-    Long sharedDate;
+    String comment;
     Long likeCount;
     Long commentCount;
-
-
+    Long sharedDate;
 }
