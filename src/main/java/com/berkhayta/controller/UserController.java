@@ -1,6 +1,7 @@
 package com.berkhayta.controller;
 
 import com.berkhayta.config.JwtManager;
+import com.berkhayta.dto.request.FindAllByUsernameRequestDto;
 import com.berkhayta.dto.request.UserLoginRequestDto;
 import com.berkhayta.dto.request.UserSaveRequestDto;
 import com.berkhayta.dto.response.ResponseDto;
@@ -9,6 +10,7 @@ import com.berkhayta.entity.User;
 import com.berkhayta.exception.AuthException;
 import com.berkhayta.exception.ErrorType;
 import com.berkhayta.service.UserService;
+import com.berkhayta.views.VwSearchUser;
 import com.berkhayta.views.VwUserProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
+@CrossOrigin(origins = "*", methods = {RequestMethod.POST, RequestMethod.GET})
 public class UserController {
     private final UserService userService;
     private final JwtManager jwtManager;
@@ -69,4 +72,16 @@ public class UserController {
         userService.editProfile(user);
         return  ResponseEntity.ok(true);
     }
+
+    @PostMapping("/search-user")
+    public ResponseEntity<ResponseDto<List<VwSearchUser>>> findAllByUserName(@RequestBody FindAllByUsernameRequestDto dto){
+        return  ResponseEntity.ok(
+                ResponseDto.<List<VwSearchUser>>builder()
+                        .code(200)
+                        .message("kullanıcılar getirildi.")
+                        .data(userService.getAllByUserName(dto))
+                        .build()
+        );
+    }
+
 }

@@ -2,7 +2,8 @@ package com.berkhayta.utility;
 
 public enum FollowState {
     BEKLEMEDE,
-    KABUL,
+    TAKIP_EDIYOR,
     RED,
-    ENGELLE
+    ENGELLE,
+    TAKIP_ETMIYOR
 }

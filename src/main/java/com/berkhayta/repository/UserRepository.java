@@ -2,8 +2,11 @@ package com.berkhayta.repository;
 
 
 import com.berkhayta.entity.User;
+import com.berkhayta.views.VwSearchUser;
 import com.berkhayta.views.VwUserAvatar;
 import com.berkhayta.views.VwUserProfile;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -22,6 +25,15 @@ public interface UserRepository extends JpaRepository<User,Long> {
     @Query("select new com.berkhayta.views.VwUserAvatar(u.id,u.userName,u.avatar) from User u where u.id=?1")
     VwUserAvatar getUserAvatar(Long id);
 
-    @Query("select new com.berkhayta.views.VwUserAvatar(u.id, u.userName,u.avatar) from User u ")
+    @Query("select new com.berkhayta.views.VwUserAvatar(u.id,u.userName,u.avatar) from User u ")
     List<VwUserAvatar> getUserAvatarList();
+
+    @Query("select new com.berkhayta.views.VwSearchUser(u.id,u.userName,u.name,u.avatar) from User u where u.userName ilike ?1")
+    List<VwSearchUser> getAllByUserName(String userName);
+
+    List<User> findAllByUserNameContainingAndIdNotIn(String s, List<Long> followIds, Pageable pageable);
+
+    List<User> findAllByUserNameLikeAndIdNotIn(String s, List<Long> followIds, PageRequest of);
+
+    List<User> findAllByIdIn(List<Long> allFollowing, PageRequest of);
 }

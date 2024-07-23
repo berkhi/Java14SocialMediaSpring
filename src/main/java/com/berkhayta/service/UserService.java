@@ -1,6 +1,7 @@
 package com.berkhayta.service;
 
 import com.berkhayta.config.JwtManager;
+import com.berkhayta.dto.request.FindAllByUsernameRequestDto;
 import com.berkhayta.dto.request.UserLoginRequestDto;
 import com.berkhayta.dto.request.UserSaveRequestDto;
 import com.berkhayta.dto.response.SearchUserResponseDto;
@@ -8,9 +9,11 @@ import com.berkhayta.entity.User;
 import com.berkhayta.exception.AuthException;
 import com.berkhayta.exception.ErrorType;
 import com.berkhayta.repository.UserRepository;
+import com.berkhayta.views.VwSearchUser;
 import com.berkhayta.views.VwUserAvatar;
 import com.berkhayta.views.VwUserProfile;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository repository;
     private final JwtManager jwtManager;
+    private final FollowService followService;
     public User save(UserSaveRequestDto dto) {
         return repository.save(User.builder()
                         .password(dto.getPassword())
@@ -80,4 +84,36 @@ public class UserService {
         );
         return result;
     }
+
+    public List<VwSearchUser> getAllByUserName(FindAllByUsernameRequestDto dto) {
+        Optional<Long> userId = jwtManager.getAuthId(dto.getToken());
+        if(userId.isEmpty()) throw new AuthException(ErrorType.BAD_REQUEST_INVALID_TOKEN);
+        List<Long> followIds = followService.findAllByUserId(userId.get());
+        if (followIds.isEmpty()) followIds = List.of(0L);
+        List<User> userList = repository
+                .findAllByUserNameLikeAndIdNotIn("%"+dto.getUserName()+"%",followIds, PageRequest.of(0,6));
+        return getVwSearchUsers(userList);
+    }
+
+    public List<VwSearchUser> getAllFollowList(List<Long> allFollowing) {
+        List<User> userList = repository.findAllByIdIn(allFollowing, PageRequest.of(0,10));
+        return getVwSearchUsers(userList);
+    }
+
+    private static List<VwSearchUser> getVwSearchUsers(List<User> userList) {
+        List<VwSearchUser> result = new ArrayList<>();
+        userList.forEach(u->{
+            result.add(
+                    VwSearchUser.builder()
+                            .avatar(u.getAvatar())
+                            .id(u.getId())
+                            .name(u.getName())
+                            .userName(u.getUserName())
+                            .build()
+            );
+        });
+
+        return result;
+    }
+
 }
